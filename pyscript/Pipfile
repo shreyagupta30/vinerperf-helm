@@ -7,6 +7,9 @@ name = "pypi"
 kubernetes = "*"
 pyyaml = "*"
 pick = "*"
+simplejson = "*"
+nested-lookup = "*"
+rich = "*"
 
 [dev-packages]
 
