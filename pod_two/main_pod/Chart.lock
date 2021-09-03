@@ -1,0 +1,6 @@
+dependencies:
+- name: poddependencies
+  repository: file://../poddependencies
+  version: 0.1.0
+digest: sha256:0e39c146aeb952338ea72086872474eb10e6d2755f49a231ae0dde8bc3c7d898
+generated: "2021-09-03T18:00:08.798332+05:30"
