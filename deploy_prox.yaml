@@ -1,0 +1,36 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: prox-service
+spec:
+  selector:
+    app: prox
+  ports:
+  - protocol: "TCP"
+    port: 8000
+    targetPort: 3000
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prox
+spec:
+  selector:
+    matchLabels:
+      app: prox
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prox
+    spec:
+      containers:
+      - name: prox
+        image: opnfv/rapid:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000

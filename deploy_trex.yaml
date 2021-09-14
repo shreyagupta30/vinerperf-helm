@@ -1,0 +1,36 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: trex-service
+spec:
+  selector:
+    app: trex
+  ports:
+  - protocol: "TCP"
+    port: 6000
+    targetPort: 5000
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trex
+spec:
+  selector:
+    matchLabels:
+      app: trex
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: trex
+    spec:
+      containers:
+      - name: trex
+        image: vsperf/trex:lakelse
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
