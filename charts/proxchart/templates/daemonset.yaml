@@ -1,14 +1,13 @@
-{{- if eq .Values.kind "Deployment"}}
+{{- if eq .Values.kind "DaemonSet"}}
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: prox
 spec:
   selector:
     matchLabels: 
       app: prox
-      {{- .Values.nodeSelector.matchLables}}
-  replicas: 1
+      key1: {{- .Values.nodeSelector.matchLables.key1}}
   template:
     metadata:
       labels:

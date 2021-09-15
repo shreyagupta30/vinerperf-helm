@@ -1,2 +1,8 @@
 # daemonset, deployment
-deploymentType: daemonset
+kind: Deployment
+
+# Nodes to deploy on
+nodeSelector:
+  matchLables:
+    key1: value1
+    key2: value2
