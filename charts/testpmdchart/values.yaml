@@ -1,5 +1,5 @@
 # daemonset, deployment
-kind: DaemonSet
+kind: Deployment
 
 # Nodes to deploy on
 nodeSelector:

@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: prox
+  name: testpmd
   annotations:
     k8s.v1.cni.cncf.io/networks: "{{- join "\",\"" .Values.extraInterfaces }}"
 spec:
   selector:
     matchLabels:
-      app: prox
+      app: testpmd
   template:
     metadata:
       labels:
-        app: prox
+        app: testpmd
     spec:
       containers:
-      - name: prox
-        image: opnfv/rapid:latest
+      - name: testpmd
+        image: ovsperf/dpdkfwd:lakelse
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000

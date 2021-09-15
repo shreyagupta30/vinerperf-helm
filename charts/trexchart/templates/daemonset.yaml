@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: prox
+  name: trex
   annotations:
     k8s.v1.cni.cncf.io/networks: "{{- join "\",\"" .Values.extraInterfaces }}"
 spec:
   selector:
     matchLabels:
-      app: prox
+      app: trex
   template:
     metadata:
       labels:
-        app: prox
+        app: trex
     spec:
       containers:
-      - name: prox
-        image: opnfv/rapid:latest
+      - name: trex
+        image: vsperf/trex:lakelse
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000

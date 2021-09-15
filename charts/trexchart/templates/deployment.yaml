@@ -1,12 +1,15 @@
+{{- if eq .Values.kind "Deployment"}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: trex
+  annotations:
+    k8s.v1.cni.cncf.io/networks: "{{- join "\",\"" .Values.extraInterfaces | toYaml | nindent 8}}"
 spec:
   selector:
     matchLabels:
       app: trex
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   template:
     metadata:
       labels:
@@ -17,4 +20,7 @@ spec:
         image: vsperf/trex:lakelse
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 5000
+        - containerPort: 3000
+      nodeSelector: 
+        {{- .Values.nodeSelector.matchLables | toYaml | nindent 12 }}
+{{- end }}
