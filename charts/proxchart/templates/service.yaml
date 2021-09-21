@@ -1,9 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "pod-two.fullname" . }}
-  labels:
-    {{- include "pod-two.labels" . | nindent 4 }}
+  name: prox
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -11,5 +9,3 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-  selector:
-    {{- include "pod-two.selectorLabels" . | nindent 4 }}

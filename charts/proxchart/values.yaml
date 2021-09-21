@@ -1,11 +1,11 @@
 # daemonset, deployment
-kind: DaemonSet
+kind: Deployment
 
 # Nodes to deploy on
-nodeSelector:
-  matchLables:
-    key1: value1
-    key2: value2
+nodeSelector: {}
+  # matchLables:
+  #   key1: value1
+  #   key2: value2
 
 # multus
 metacniType: multus
@@ -13,4 +13,8 @@ extraInterfaces:
   net-attach-def1
   net-attach-def2
 
-replicas: 1
+replicas: 2
+
+service:
+  type: NodePort
+  port: 8081
