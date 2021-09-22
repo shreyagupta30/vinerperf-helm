@@ -7,8 +7,12 @@ metadata:
 
 spec:
   containers:
-  - name: nginx
-    image: nginx:1.7.9
-    imagePullPolicy: IfNotPresent
-    ports:
-    - containerPort: 80
+    - name: prox
+      image: opnfv/rapid:latest
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 3000
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80

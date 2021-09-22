@@ -5,6 +5,7 @@ import json
 import yaml
 from rich.console import Console
 from rich.table import Table
+import time
 
 
 console = Console()
@@ -25,7 +26,12 @@ def parse_helm_chart(helm_path):
         doc = yaml.load(f)
     name_of_chart = doc['name']
 
-    return name_of_chart
+    values_file = os.path.join(helm_path,"values.yaml")
+    with open(values_file, 'r') as f:
+        doc = yaml.load(f)
+    n_pods = doc['replicas']
+    return (name_of_chart, n_pods)
+
 
 def service_details(name):
     print("\nDEPLOYEMENT DETAILS\n")
@@ -54,11 +60,11 @@ def service_details(name):
     )
     console.print(table)
 
-def pod_details():
+def pod_details(replicas):
     
     print("\nPOD DETAILS\n")
 
-    pp = subprocess.Popen(f"kubectl get pod -o json", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    pp = subprocess.Popen(f"kubectl get pods -o json", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
     output = pp.stdout.read()
     pod_string = output.decode().replace("'", '"')
     true = True
@@ -75,17 +81,17 @@ def pod_details():
     table.add_column("POD-IP")
     table.add_column("POD-IPs")
     
+    #print(replicas) 
+    for i in range(replicas):
 
-
-    table.add_row(
-        f'{pod_json["items"][0]["metadata"]["name"]}',
-        f'{pod_json["items"][0]["metadata"]["namespace"]}',
-        f'{pod_json["items"][0]["status"]["hostIP"]}',
-        f'{pod_json["items"][0]["status"]["phase"]}',
-        f'{pod_json["items"][0]["status"]["podIP"]}',
-        f'{pod_json["items"][0]["status"]["podIPs"][0]["ip"]}',
-        
-    )
+        table.add_row(
+            f'{pod_json["items"][i]["metadata"]["name"]}',
+            f'{pod_json["items"][i]["metadata"]["namespace"]}',
+            f'{pod_json["items"][i]["status"]["hostIP"]}',
+            f'{pod_json["items"][i]["status"]["phase"]}',
+            f'{pod_json["items"][i]["status"]["podIP"]}',
+            f'{pod_json["items"][i]["status"]["podIPs"]}',
+        )
     console.print(table)
 
 def main():
@@ -94,18 +100,26 @@ def main():
 
     helm_location = input("Enter the location of helm chart:  ")
         
-    name = parse_helm_chart(helm_location)
+    name,replicas = parse_helm_chart(helm_location)
     
     subprocess.Popen(f"helm install {name} {helm_location}",shell=True,stdout=subprocess.PIPE,).communicate()
+
+    time.sleep(10)
 
     # status of helm charts
 
     print("\nStatus of helm charts\n")
     subprocess.run("helm list", shell =True)
-    print("--" * 70)
+    print("--" * 50)
+    
 
+    # pp = subprocess.Popen("kubectl exec -it nginx -c nginx -- ip -o a", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    # output = pp.stdout.read()
+    # _string = output.decode().replace("'", '"')
+    # ipregex=r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+    # print(re.search(ipregex,_string))
     # pod details
-    pod_details()
+    pod_details(replicas)
     
     #deployment details
     service_details(name)

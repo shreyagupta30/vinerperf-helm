@@ -20,7 +20,11 @@ spec:
         image: opnfv/rapid:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 3000
+          - containerPort: 3000
+      - name: nginx
+        image: nginx:alpine
+        ports:
+          - containerPort: 80
       nodeSelector: 
         {{- .Values.nodeSelector.matchLables | toYaml | nindent 12 }}
 {{- end }}
