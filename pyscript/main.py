@@ -6,6 +6,7 @@ import yaml
 from rich.console import Console
 from rich.table import Table
 import time
+import re
 
 
 console = Console()
@@ -56,7 +57,7 @@ def service_details(name):
         f'{_json["spec"]["type"]}',
         f'{_json["spec"]["clusterIP"]}',
         f'{_json["status"]["loadBalancer"]}',
-        tt
+        tt,
     )
     console.print(table)
 
@@ -80,10 +81,12 @@ def pod_details(replicas):
     table.add_column("PHASE")
     table.add_column("POD-IP")
     table.add_column("POD-IPs")
+    table.add_column("INTERFACE IPs")    
     
+    podname = pod_json["items"][0]["metadata"]["name"]
+
     #print(replicas) 
     for i in range(replicas):
-
         table.add_row(
             f'{pod_json["items"][i]["metadata"]["name"]}',
             f'{pod_json["items"][i]["metadata"]["namespace"]}',
@@ -93,13 +96,36 @@ def pod_details(replicas):
             f'{pod_json["items"][i]["status"]["podIPs"]}',
         )
     console.print(table)
+    ip_interface(podname)
+
+def ip_interface(podname):
+
+    pp = subprocess.Popen(f"kubectl exec -i {podname} -c nginx -- ip -o a", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    output = pp.stdout.read()
+    _string = output.decode().replace("'", '"')
+    ipregex = r"((?:[0-9]{1,3}[.]){3}[0-9]{1,3}/[0-9]{1,2})"
+    ipregex2 = r"((?:[0-9]{1,3}[.]){3}[0-9]{1,3})"
+    list1=re.findall(ipregex, _string)
+    list2=re.findall(ipregex2 ,_string)
+    ip_list = list1 + list2
+    ip_string = ', '.join(ip_list)
+    
+    table = Table(show_header=True)
+
+    table.add_column("POD NAME")
+    table.add_column("INTERFACE IPs")
+
+    table.add_row(
+        podname,
+        ip_string,
+    )
+    console.print(table)
+
 
 def main():
 
     check_system_installations()
-
     helm_location = input("Enter the location of helm chart:  ")
-        
     name,replicas = parse_helm_chart(helm_location)
     
     subprocess.Popen(f"helm install {name} {helm_location}",shell=True,stdout=subprocess.PIPE,).communicate()
@@ -112,18 +138,12 @@ def main():
     subprocess.run("helm list", shell =True)
     print("--" * 50)
     
-
-    # pp = subprocess.Popen("kubectl exec -it nginx -c nginx -- ip -o a", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
-    # output = pp.stdout.read()
-    # _string = output.decode().replace("'", '"')
-    # ipregex=r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
-    # print(re.search(ipregex,_string))
-    # pod details
+    #pod details
     pod_details(replicas)
     
     #deployment details
     service_details(name)
-    
+
 
 if __name__ == "__main__":
     main()

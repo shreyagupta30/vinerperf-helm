@@ -13,7 +13,7 @@ extraInterfaces:
   net-attach-def1
   net-attach-def2
 
-replicas: 2
+replicas: 1
 
 service:
   type: NodePort
